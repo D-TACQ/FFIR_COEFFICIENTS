@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 
 import argparse
+import os
 
 # ./mungerV2.py --map=ACQ480_FIR_DEC10_reload_order.txt  128tap_by20.txt 128tap_by20.txt
 
 def get_parser():
     parser = argparse.ArgumentParser(description='Coefficient Munger')
     parser.add_argument('--map', required=True, help='reorder file to apply')
-    parser.add_argument('--raw_len', default=128, help='length of raw coeff')
+    parser.add_argument('--raw_len', default=128, type=int, help='length of raw coeff')
     parser.add_argument('cfiles', nargs='+', help="files to munge")
     return parser
 
@@ -25,7 +26,7 @@ def run_main(args):
         reordered = []
         for index in coeff_order:
             reordered.append(int(padded[int(index)].rstrip()))
-        outname = f'{filename.split(".")[0]}_{args.map.split(".")[0]}.munged'
+        outname = f'{os.path.split(filename)[0]}/{os.path.split(filename)[1].split(".")[0]}_reordered.txt'
         with open(outname, 'w') as file:
             for value in reordered:
                 file.write(f'{value}\n')
