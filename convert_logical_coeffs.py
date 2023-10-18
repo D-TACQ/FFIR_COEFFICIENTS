@@ -3,34 +3,53 @@
 import argparse
 import os
 
-# ./mungerV2.py --map=ACQ480_FIR_DEC10_reload_order.txt  128tap_by20.txt 128tap_by20.txt
+"""
+Usage:
+    ./convert_logical_coeffs.py ACQ480_FIR_DEC10_reload_order.txt  128tap_by20.txt --sym=1
+    ./convert_logical_coeffs.py GA_FIR_BLOCK_reload_order.txt 28_Asymm_coeffs.txt --sym=0
+"""
 
 def get_parser():
     parser = argparse.ArgumentParser(description='Coefficient Munger')
-    parser.add_argument('--map', required=True, help='reorder file to apply')
-    parser.add_argument('--raw_len', default=128, type=int, help='length of raw coeff')
+    parser.add_argument('order', nargs=1, help='reorder file to apply')
     parser.add_argument('cfiles', nargs='+', help="files to munge")
+    parser.add_argument('--sym', default=1, type=int, help='symmetric coefficient')
     return parser
 
 def run_main(args):
-    coeff_order = []
-    with open(args.map) as file:
+    order = []
+    with open(args.order[0]) as file:
         for line in file:
-            coeff_order.append(int(line.split('Coefficient')[1].strip()))
+            value = line.split('Coefficient')[-1].strip()
+            if value:
+                order.append(int(value))
+
     for filename in args.cfiles:
+
+        input = []
         with open(filename) as file:
-            raw = file.readlines()
-        coeff_len = len(coeff_order)
-        padded = ["0"] * (coeff_len - int(args.raw_len / 2))
-        padded.extend(raw)
-        reordered = []
-        for index in coeff_order:
-            reordered.append(int(padded[int(index)].rstrip()))
-        outname = f'{os.path.split(filename)[0]}/{os.path.split(filename)[1].split(".")[0]}_reordered.txt'
+            for line in file:
+                input.append(int(line.strip()))
+
+        order_len = len(order)
+        input_len = len(input)
+        padded = [0] * (order_len - int(input_len / (args.sym + 1)))
+
+        if args.sym:
+            padded = padded + input 
+        else:
+            padded = input + padded
+
+        output = []
+        for input_idx in order:
+            output.append(padded[input_idx])
+
+        outname = os.path.join(os.path.split(filename)[0], f"{os.path.split(filename)[1].split('.')[0]}_reordered.txt")
         with open(outname, 'w') as file:
-            for value in reordered:
+            for value in output:
                 file.write(f'{value}\n')
-        #print(f'{filename} -> {args.map} -> {outname}')
+
+        #print(f'{filename} -> {args.order[0]} -> {outname}')
         print(f'Saved as {outname}')
 
 if __name__ == '__main__':
