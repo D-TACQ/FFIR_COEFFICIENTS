@@ -18,9 +18,10 @@ Usage:
 
 def get_parser():
     parser = argparse.ArgumentParser(description='Coefficient Munger')
-    parser.add_argument('--map', required=True, help='reorder file to apply')
-    parser.add_argument('cfiles', nargs='+', help="files to munge")
-    parser.add_argument('--sym', required=True, type=int, help='symmetric coefficient?')
+    parser.add_argument('--map', required=True, help='Map/reorder file to apply')
+    parser.add_argument('cfiles', nargs='+', help="Files to reorder")
+    parser.add_argument('--sym', required=True, type=int, help='Target FIR has symmetric coefficients?')
+    parser.add_argument('--tmp', default=0, type=int, help='Write output file to local tmp file')
     return parser
 
 def run_main(args):
@@ -50,8 +51,11 @@ def run_main(args):
         output = []
         for input_idx in order:
             output.append(padded[input_idx])
-
-        outname = os.path.join(os.path.split(filename)[0], f"{os.path.split(filename)[1].split('.')[0]}_reordered.txt")
+        
+        if args.tmp:
+            outname = "coeffs.tmp"
+        else:
+            outname = os.path.join(os.path.split(filename)[0], f"{os.path.split(filename)[1].split('.')[0]}_reordered.txt")
         with open(outname, 'w') as file:
             for value in output:
                 file.write(f'{value}\n')
