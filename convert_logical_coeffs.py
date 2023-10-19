@@ -9,16 +9,23 @@ Usage:
     ./convert_logical_coeffs.py GA_FIR_BLOCK_reload_order.txt 28_Asymm_coeffs.txt --sym=0
 """
 
+#    Symmetric coefficients imply that we will only load the first half of coefficients to the filter.
+#    N.B! One must refer to the filter architecture to determine whether or not it is expecting symmetric coefficients
+#    Any optimisations that can be applied when using symmetric coefficients are selected at FPGA compile time
+
+#    e.g. If NTAPS = 180, cfile has 180 entries, then the reordered output will have only 90 entries,
+#    reordered to match the map file (which should also have 90 entries)
+
 def get_parser():
     parser = argparse.ArgumentParser(description='Coefficient Munger')
-    parser.add_argument('order', nargs=1, help='reorder file to apply')
+    parser.add_argument('--map', required=True, help='reorder file to apply')
     parser.add_argument('cfiles', nargs='+', help="files to munge")
-    parser.add_argument('--sym', default=1, type=int, help='symmetric coefficient')
+    parser.add_argument('--sym', required=True, type=int, help='symmetric coefficient?')
     return parser
 
 def run_main(args):
     order = []
-    with open(args.order[0]) as file:
+    with open(args.map) as file:
         for line in file:
             value = line.split('Coefficient')[-1].strip()
             if value:
