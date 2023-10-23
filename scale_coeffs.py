@@ -2,6 +2,7 @@
 
 import argparse
 import os
+import math
 
 # ./scale_coeffs.py --coeff_width=24  128tap_by20.txt
 
@@ -19,17 +20,22 @@ def run_main(args):
 	floats = [eval(i) for i in raw] # Convert from str to floats
 	print(floats)
 	scaled_coeffs = [i * sf for i in floats] # Scale to coeff width
-	print(scaled_coeffs)
-	scaled_coeffs = [round(i) for i in scaled_coeffs] # Quantise
+	scaled_coeffs = [math.floor(i) for i in scaled_coeffs] # Quantise; floor prevents overflow due to rounding up of several values
 	print(scaled_coeffs)
 
+	print(f'Sum of coeffs = {sum(floats)}')
+	print(f'Sum of scaled coeffs = {sum(scaled_coeffs)}')
+
 	# Save scaled & quantised file
-	outfile = f'{os.path.split(args.filename)[0]}/{os.path.split(args.filename)[1].split(".")[0]}_scaled.txt'
+	if os.path.split(args.filename)[0] == "": # If file is in local dir
+		outfile = f'{os.path.split(args.filename)[1].split(".")[0]}_scaled.txt'
+	else: # Put the file back from whence it came
+		outfile = f'{os.path.split(args.filename)[0]}/{os.path.split(args.filename)[1].split(".")[0]}_scaled.txt'
 	#print(outfile)
 	with open(outfile, 'w') as file:
 		for value in scaled_coeffs:
 			file.write(f'{value}\n')
-	print(f'Saved as {outfile}')
+	print(f'\nSaved as {outfile}')
 
 
 if __name__ == '__main__':
