@@ -7,14 +7,13 @@ import math
 # ./scale_coeffs.py --coeff_width=24  128tap_by20.txt
 
 def get_parser():
-    parser = argparse.ArgumentParser(description='Coefficient Munger')
+    parser = argparse.ArgumentParser(description='Coefficient Scaler')
     parser.add_argument('--coeff_width', type=int, required=True, help='Bitwidth of coefficients')
     parser.add_argument('filename', help="floating point coefficients to scale and quantise")
     return parser
 
 def run_main(args):
 	sf = 2**(args.coeff_width-1)-1 # Scale Factor, +ve full scale
-	print(f'{os.path.split(args.filename)[0]}')
 	with open(args.filename) as file:
 		raw = file.read().splitlines()
 	floats = [eval(i) for i in raw] # Convert from str to floats
