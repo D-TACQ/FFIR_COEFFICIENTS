@@ -90,20 +90,24 @@ def run_main(args):
     # #scaletaps[:] = (taps/sumcoeffs)*1
     # sumcoeffs2 = np.sum(scaletaps)
     
-    
+    if os.path.split(args.cfile)[0] == "": # If file is in local dir
+        outfile = f'{os.path.split(args.cfile)[1].split(".")[0]}'
+    else: # Put the file back from whence it came
+        outfile = f'{os.path.split(args.cfile)[0]}/{os.path.split(args.cfile)[1].split(".")[0]}'
+
     #w1, h1 = signal.freqz(scaletaps/coeff_factor, [1], worN=2000)
     w1, h1 = signal.freqz(taps, [1], worN=512)
-    plot_title=""
+    plot_title="Frequency Response"
     plot_response(fs, w1, h1, plot_title, numtaps, "r")
-    fig_file = "GA/MWatkins/freq_response_3dB_zoom.pdf"
-    #plt.savefig(fig_file,format='pdf')
+    fig_file = f'{outfile}_freq_resp.pdf'
+    plt.savefig(fig_file,format='pdf')
 
-    # # Plot quantised result
-    # w2, h2 = signal.freqz(scaletaps/sf, [1], worN=512)
-    # plot_title=""
-    # plot_response(fs, w2, h2, plot_title, numtaps, "r")
-    # fig_file = "GA/MWatkins/freq_response_3dB_zoom.pdf"
-    # #plt.savefig(fig_file,format='pdf')
+    # Plot quantised result
+    w2, h2 = signal.freqz(scaletaps/sf, [1], worN=512)
+    plot_title="Quantised Frequency Response"
+    plot_response(fs, w2, h2, plot_title, numtaps, "b")
+    fig_file = f'{outfile}_freq_resp_quant.pdf'
+    plt.savefig(fig_file,format='pdf')
 
     plt.show()
     
