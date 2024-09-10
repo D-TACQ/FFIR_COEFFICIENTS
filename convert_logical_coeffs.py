@@ -56,7 +56,7 @@ def run_main(args):
             outname = "coeffs.tmp"
         else:
             if os.path.split(filename)[0] == "": # If file is in local dir
-                outname = f'{os.path.split(filename)[1].split(".")[0]}_scaled.txt'
+                outname = f'{os.path.split(filename)[1].split(".")[0]}_reordered.txt'
             else: # Put the file back from whence it came
                 outname = f'{os.path.split(filename)[0]}/{os.path.split(filename)[1].split(".")[0]}_reordered.txt'
         with open(outname, 'w') as file:
